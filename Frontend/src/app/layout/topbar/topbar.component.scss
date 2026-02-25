@@ -1,0 +1,107 @@
+.topbar {
+    height: 58px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    gap: 16px;
+    background: var(--bg-surface);
+    flex-shrink: 0;
+  }
+  
+  .topbar-left { flex: 1; }
+  
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .search-wrap {
+    position: relative;
+  
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 13px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+  }
+  
+  .search-input {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 12px 7px 32px;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 13px;
+    outline: none;
+    width: 220px;
+    transition: border-color 0.15s;
+  
+    &::placeholder { color: var(--text-muted); }
+    &:focus { border-color: var(--border-light); }
+  }
+  
+  .btn {
+    padding: 7px 16px;
+    border-radius: 7px;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  
+  .btn-ghost {
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  
+    &:hover { color: var(--text-primary); border-color: var(--border-light); }
+  }
+  
+  .btn-primary {
+    background: var(--accent);
+    color: #001a14;
+    font-weight: 600;
+  
+    &:hover { background: #00f0c0; }
+  }
+  
+  .btn-icon {
+    width: 34px; height: 34px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    position: relative;
+  
+    &:hover { border-color: var(--border-light); color: var(--text-primary); }
+  }
+  
+  .notif-dot {
+    position: absolute;
+    top: -4px; right: -4px;
+    min-width: 16px; height: 16px;
+    background: var(--red);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--bg-surface);
+    padding: 0 3px;
+  }

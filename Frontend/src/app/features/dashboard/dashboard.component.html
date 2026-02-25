@@ -1,0 +1,207 @@
+<div class="page-header">
+  <h1 class="page-title">Dashboard</h1>
+  <p class="page-sub">Live overview — updated every 15 minutes</p>
+</div>
+
+<!-- KPI Cards -->
+<div class="kpi-grid">
+  <div class="kpi-card accent">
+    <div class="kpi-header">
+      <div class="kpi-icon">📦</div>
+      <span class="kpi-trend trend-up">↑ 4.2%</span>
+    </div>
+    <div class="kpi-value">{{ kpi()?.totalSkus | number }}</div>
+    <div class="kpi-label">Total SKUs in Stock</div>
+    <div class="kpi-sub">Value: ₹{{ (kpi()?.totalStockValue ?? 0) | number:'1.0-0' }}</div>
+  </div>
+
+  <div class="kpi-card red">
+    <div class="kpi-header">
+      <div class="kpi-icon">⚠️</div>
+      <span class="kpi-trend trend-down">↑ 7 new</span>
+    </div>
+    <div class="kpi-value">{{ kpi()?.criticalAlerts }}</div>
+    <div class="kpi-label">Critical ROL Alerts</div>
+    <div class="kpi-sub">
+      <a [routerLink]="['/rol']" style="color:var(--red)">View all alerts →</a>
+    </div>
+  </div>
+
+  <div class="kpi-card blue">
+    <div class="kpi-header">
+      <div class="kpi-icon">🛒</div>
+    </div>
+    <div class="kpi-value">{{ kpi()?.openPurchaseOrders }}</div>
+    <div class="kpi-label">Open Purchase Orders</div>
+    <div class="kpi-sub">{{ kpi()?.pendingApprovals }} pending approval</div>
+  </div>
+
+  <div class="kpi-card amber">
+    <div class="kpi-header">
+      <div class="kpi-icon">⏳</div>
+    </div>
+    <div class="kpi-value">{{ kpi()?.expiringIn30Days }}</div>
+    <div class="kpi-label">Expiring in 30 Days</div>
+    <div class="kpi-sub">
+      <a [routerLink]="['/inventory']" [queryParams]="{filter: 'expiring'}">View →</a>
+    </div>
+  </div>
+</div>
+
+<!-- Charts + Alerts row -->
+<div class="dash-grid">
+  <!-- Stock Movement Chart -->
+  <div class="card">
+    <div class="card-header">
+      <span class="live-dot"></span>
+      <div class="card-title">Stock Movement & Consumption</div>
+      <div class="card-actions">
+        <button class="tab-btn" [class.active]="chartDays() === 7"  (click)="loadChart(7)">7D</button>
+        <button class="tab-btn" [class.active]="chartDays() === 30" (click)="loadChart(30)">30D</button>
+        <button class="tab-btn" [class.active]="chartDays() === 90" (click)="loadChart(90)">90D</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- TODO: Replace with ng2-charts LineChart component -->
+      <div class="chart-placeholder">
+        <p style="color:var(--text-muted);text-align:center;padding:40px 0">
+          📊 Stock movement chart renders here<br>
+          <small>Wire up ng2-charts with stockMovement() data</small>
+        </p>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-item accent">● Inbound (GRN)</span>
+        <span class="legend-item blue">● Outbound (Issued)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Alerts -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🚨 Active Alerts</div>
+      <a class="view-all" [routerLink]="['/rol']">View all</a>
+    </div>
+    <div class="alert-list">
+      @for (alert of topAlerts(); track alert.id) {
+        <div class="alert-item" [class]="(alert?.severity ?? '') | lowercase">
+          <div class="alert-dot"></div>
+          <div class="alert-content">
+            <div class="alert-title-text">{{ alert.itemName }}</div>
+            <div class="alert-meta">
+              Stock: {{ alert.currentStock }} · ROL: {{ alert.reorderLevel }} · {{ alert.daysRemaining }}d remaining
+            </div>
+          </div>
+          <a class="alert-action" [routerLink]="['/rol', alert.id]">Review</a>
+        </div>
+      }
+      @empty {
+        <p class="empty-hint">No active alerts</p>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Row: Inventory Snapshot + Pending Approvals -->
+<div class="bottom-grid">
+
+  <!-- Inventory Snapshot -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📦 Inventory Snapshot</div>
+      <div class="card-actions">
+        <button class="tab-btn" [class.active]="inventoryFilter() === 'all'"      (click)="setInventoryFilter('all')">All</button>
+        <button class="tab-btn" [class.active]="inventoryFilter() === 'low'"      (click)="setInventoryFilter('low')">Low Stock</button>
+        <button class="tab-btn" [class.active]="inventoryFilter() === 'expiring'" (click)="setInventoryFilter('expiring')">Expiring</button>
+      </div>
+      <a class="view-all" [routerLink]="['/inventory']">Full inventory →</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Item / Batch</th>
+            <th>Category</th>
+            <th>Stock</th>
+            <th>ROL</th>
+            <th>Level</th>
+            <th>Expiry</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of filteredInventory(); track item.id) {
+            <tr (click)="goToItem(item.id)">
+              <td>
+                <strong>{{ item['name'] }}</strong>
+                <div class="item-batch">{{ item['batches']?.[0]?.batchNumber ?? '—' }}</div>
+              </td>
+              <td class="muted">{{ item.category ?? '—' }} · Class {{ item.abcClass ?? '—' }}</td>
+              <td>
+                <strong [class]="getStockClass(item)">{{ (item.currentStock ?? 0) | number }}</strong>
+              </td>
+              <td class="mono">{{ (item.reorderLevel ?? 0) | number }}</td>
+              <td>
+                <div class="stock-bar">
+                  <div
+                    class="stock-fill"
+                    [class]="getStockBarClass(item)"
+                    [style.width.%]="getStockPercent(item)"
+                  ></div>
+                </div>
+              </td>
+              <td class="mono" [class.expiry-warn]="isExpiringItem(item)">
+                {{ item.batches?.[0]?.expiryDate | date:'MMM yyyy' }}
+              </td>
+              <td>
+                <span class="badge" [class]="getStatusBadgeClass(item.status ?? '')">
+                  {{ item['status'] }}
+                </span>
+              </td>
+            </tr>
+          }
+          @empty {
+            <tr>
+              <td colspan="7" class="empty-row">No items to display</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pending Approvals -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">⏳ Pending Approvals</div>
+      <a class="view-all" [routerLink]="['/purchase-orders']" [queryParams]="{status: 'PendingApproval'}">View all</a>
+    </div>
+    <div class="approval-list">
+      @for (po of pendingApprovals(); track po.id) {
+        <div class="approval-item">
+          <div class="appr-info">
+            <div class="appr-po">
+              {{ po.poNumber }}
+              <span class="badge" [class]="getLevelBadgeClass(po?.approvalLevel ?? 0)">
+                L{{ po.approvalLevel }}
+              </span>
+            </div>
+            <div class="appr-vendor">{{ po.vendorName }}</div>
+            <div class="appr-meta">{{ (po?.items?.length) }} items · {{ po.createdAt | date:'dd MMM yy' }}</div>
+          </div>
+          <div class="appr-right">
+            <div class="appr-amount">₹{{ (po.totalAmount) | number:'1.0-0' }}</div>
+            <div class="appr-btns">
+              <button class="appr-btn appr-approve" (click)="approvePo(po.id)">✓ Approve</button>
+              <button class="appr-btn appr-reject"  (click)="rejectPo(po.id)">✕ Reject</button>
+            </div>
+          </div>
+        </div>
+      }
+      @empty {
+        <p class="empty-hint">No pending approvals</p>
+      }
+    </div>
+  </div>
+
+</div>

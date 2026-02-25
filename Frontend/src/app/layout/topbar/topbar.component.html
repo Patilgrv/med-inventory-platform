@@ -1,0 +1,29 @@
+<header class="topbar">
+    <div class="topbar-left">
+      <ng-content select="[topbarTitle]" />
+    </div>
+
+    <div class="topbar-actions">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input
+          class="search-input"
+          placeholder="Search items, POs, vendors…"
+          [(ngModel)]="searchQuery"
+          (keyup.enter)="onSearch()"
+        />
+      </div>
+
+      <button class="btn-icon" [routerLink]="['/notifications']">
+        🔔
+        @if (signalr.unreadCount() > 0) {
+          <span class="notif-dot">{{ signalr.unreadCount() }}</span>
+        }
+      </button>
+
+      <button class="btn btn-ghost">⬇ Export</button>
+      <button class="btn btn-primary" [routerLink]="['/purchase-orders/new']">
+        + New PO
+      </button>
+    </div>
+  </header>

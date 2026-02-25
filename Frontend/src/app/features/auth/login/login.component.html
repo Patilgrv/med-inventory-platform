@@ -1,0 +1,34 @@
+<div class="login-shell">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">🏭</div>
+      <div class="logo-name">SCWMS</div>
+      <div class="logo-sub">Supply Chain & Warehouse Management</div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" formControlName="email" placeholder="you@softude.com" />
+        @if (form.get('email')?.invalid && form.get('email')?.touched) {
+          <span class="field-error">Valid email required</span>
+        }
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" formControlName="password" placeholder="••••••••" />
+      </div>
+
+      @if (errorMsg) {
+        <div class="login-error">{{ errorMsg }}</div>
+      }
+
+      <button type="submit" class="btn-login" [disabled]="loading">
+        {{ loading ? 'Signing in…' : 'Sign In' }}
+      </button>
+    </form>
+
+    <div class="login-footer">Softude Technologies · SCWMS v1.0</div>
+  </div>
+</div>

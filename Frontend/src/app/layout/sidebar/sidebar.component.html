@@ -1,0 +1,65 @@
+<nav class="sidebar">
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-badge">
+        <div class="logo-icon">🏭</div>
+        <div class="logo-text">
+          SCWMS
+          <span>Softude Technologies</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Core Nav -->
+    <div class="nav-section">
+      <div class="nav-label">Core</div>
+      @for (item of coreNav; track item.route) {
+        <a class="nav-item" [routerLink]="item.route" routerLinkActive="active">
+          <span class="nav-icon">{{ item.icon }}</span>
+          {{ item.label }}
+          @if (item.badge) {
+            <span class="nav-badge" [class]="item.badgeColor">{{ item.badge }}</span>
+          }
+        </a>
+      }
+    </div>
+
+    <!-- Operations Nav -->
+    <div class="nav-section">
+      <div class="nav-label">Operations</div>
+      @for (item of opsNav; track item.route) {
+        <a class="nav-item" [routerLink]="item.route" routerLinkActive="active">
+          <span class="nav-icon">{{ item.icon }}</span>
+          {{ item.label }}
+          @if (item.badge) {
+            <span class="nav-badge" [class]="item.badgeColor">{{ item.badge }}</span>
+          }
+        </a>
+      }
+    </div>
+
+    <!-- Admin (only for Admin role) -->
+    @if (isAdmin()) {
+      <div class="nav-section">
+        <div class="nav-label">Admin</div>
+        @for (item of adminNav; track item.route) {
+          <a class="nav-item" [routerLink]="item.route" routerLinkActive="active">
+            <span class="nav-icon">{{ item.icon }}</span>
+            {{ item.label }}
+          </a>
+        }
+      </div>
+    }
+
+    <!-- User Card -->
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="avatar">{{ userInitials() }}</div>
+        <div class="user-info">
+          <div class="user-name">{{ user()?.name }}</div>
+          <div class="user-role">{{ user()?.role }}</div>
+        </div>
+        <span class="menu-dots" (click)="logout()">⏻</span>
+      </div>
+    </div>
+  </nav>
