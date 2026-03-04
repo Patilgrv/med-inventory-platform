@@ -14,5 +14,10 @@ namespace MedInventory.Domain.Interfaces
 
         // A contract saying: "Whoever implements this MUST be able to give me all medicines"
         Task<IEnumerable<Medicine>> GetAllAsync();
+
+        Task UpdateAsync(Medicine medicine);
+        Task<Medicine?> GetByIdAsync(Guid id); // We need this to find the medicine first!
+
+        Task DeleteAsync(Guid id);
     }
 }

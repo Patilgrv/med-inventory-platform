@@ -33,4 +33,19 @@ public class MedicinesController : ControllerBase
         var medicines = await _mediator.Send(new GetMedicinesQuery());
         return Ok(medicines);
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(Guid id, UpdateMedicineCommand command)
+    {
+        if (id != command.Id) return BadRequest();
+        await _mediator.Send(command);
+        return NoContent(); // 204 No Content is standard for successful updates
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _mediator.Send(new DeleteMedicineCommand(id));
+        return NoContent(); // 204 No Content is standard for successful deletions
+    }
 }
