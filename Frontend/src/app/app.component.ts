@@ -1,16 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { SignalrService } from '@core/services/signalr.service';
+import { SignalrService } from '@core/services/common/signalr.service';
 import { AuthService } from '@core/auth/auth.service';
+import { GlobalLoaderComponent } from './shared/components/global-loader/global-loader.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  template: `<router-outlet />`,
+  imports: [RouterOutlet, GlobalLoaderComponent],
+  templateUrl: './app.component.html',
 })
 export class AppComponent implements OnInit {
-  constructor(private signalr: SignalrService, private auth: AuthService) {}
+  private signalr = inject(SignalrService);
+  private auth = inject(AuthService);
 
   ngOnInit(): void {
     // Connect SignalR as soon as we have a logged-in user
