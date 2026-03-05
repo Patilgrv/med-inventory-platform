@@ -33,3 +33,4 @@ export interface PurchaseOrder {
 // Re-export for other features (inventory, rol, etc.)
 export type { InventoryItem, ItemBatch, StockLedgerEntry } from './inventory.models';
 export type { RolAlert, RolCalculation } from './rol.models';
+export type { Medicine, CreateMedicineRequest, UpdateMedicineRequest } from './medicine.models';

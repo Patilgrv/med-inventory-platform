@@ -54,6 +54,11 @@ export class ApiService {
     return this.http.patch<T>(this.url(endpoint), body);
   }
 
+  delete<T>(endpoint: string): Observable<T> {
+    if (!API_READY) return of(this.getMock(endpoint) as T);
+    return this.http.delete<T>(this.url(endpoint));
+  }
+
   /** Empty/mock response when API is not ready (list = [], single = {}). */
   private getMock(endpoint: string): unknown {
     const listPaths = [
