@@ -25,7 +25,15 @@ builder.Services.AddScoped<IMedicineRepository, MedicineRepository>();
 // 3. Register MediatR
 // This tells MediatR to look in the Application project for your Handlers
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddMedicineCommand).Assembly));
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AngularApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200") // The default Angular port
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -38,7 +46,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
+app.UseCors("AngularApp");
 app.MapControllers();
 
 app.Run();
