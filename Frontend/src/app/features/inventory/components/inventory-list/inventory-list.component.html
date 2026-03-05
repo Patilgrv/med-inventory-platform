@@ -1,0 +1,45 @@
+<div class="page-header">
+  <div class="page-header-left">
+    <h1 class="page-title">Inventory Management</h1>
+    <p class="page-sub">
+      <span class="live-dot"></span>
+      Real-time stock across all warehouses
+    </p>
+  </div>
+  <div class="page-header-right">
+    <div class="warehouse-pills">
+      <span class="wh-pill active">WH-01 Main</span>
+      <span class="wh-pill">WH-02 Cold</span>
+      <span class="wh-pill">WH-03 Annexe</span>
+    </div>
+  </div>
+</div>
+
+<!-- KPI Stats Bar -->
+<app-inventory-stats-bar [stats]="stats()" />
+
+<!-- Filters (search, tabs, warehouse, sort) -->
+<app-inventory-filters
+  [warehouses]="warehouses()"
+  [counts]="tabCounts()"
+  (filterChange)="onFilterChange($event)"
+  (addClicked)="goToAdd()"
+  (exportClicked)="onExport()"
+/>
+
+<!-- Table -->
+<app-inventory-table
+  [items]="items()"
+  [loading]="loading()"
+  [page]="page()"
+  [pageSize]="pageSize()"
+  [total]="total()"
+  [totalPages]="totalPages()"
+  (rowClick)="goToDetail($event)"
+  (editClick)="goToEdit($event)"
+  (ledgerClick)="goToLedger($event)"
+  (transferClick)="openTransfer($event)"
+  (pageChange)="onPageChange($event)"
+  (pageSizeChange)="onPageSizeChange($event)"
+  (sortChange)="onSortChange($event)"
+/>

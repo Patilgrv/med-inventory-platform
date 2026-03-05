@@ -1,0 +1,59 @@
+<div class="filters-wrap">
+
+  <!-- Top row: search + warehouse + sort + action -->
+  <div class="filters-top">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input
+        class="search-input"
+        placeholder="Search by name, SKU, batch…"
+        [(ngModel)]="state.search"
+        (ngModelChange)="onSearchChange($event)"
+      />
+      @if (state.search) {
+        <span class="search-clear" (click)="clearSearch()">✕</span>
+      }
+    </div>
+
+    <select class="filter-select" [(ngModel)]="state.warehouseId" (ngModelChange)="emit()">
+      <option value="">All Warehouses</option>
+      @for (wh of warehouses; track wh.id) {
+        <option [value]="wh.id">{{ wh.name }}</option>
+      }
+    </select>
+
+    <select class="filter-select" [(ngModel)]="state.sortBy" (ngModelChange)="emit()">
+      <option value="status">Sort: Status</option>
+      <option value="name">Sort: Name</option>
+      <option value="currentStock">Sort: Stock Level</option>
+      <option value="expiryDate">Sort: Expiry</option>
+      <option value="abcClass">Sort: ABC Class</option>
+    </select>
+
+    <button class="sort-dir-btn" (click)="toggleSortDir()" [title]="state.sortDir === 'asc' ? 'Ascending' : 'Descending'">
+      {{ state.sortDir === 'asc' ? '↑ ASC' : '↓ DESC' }}
+    </button>
+
+    <div class="filters-spacer"></div>
+
+    <button class="btn btn-ghost" (click)="exportClicked.emit()">⬇ Export</button>
+    <button class="btn btn-primary" (click)="addClicked.emit()">+ Add Item</button>
+  </div>
+
+  <!-- Tab row: status filters -->
+  <div class="filter-tabs">
+    @for (tab of tabs; track tab.value) {
+      <button
+        class="filter-tab"
+        [class.active]="state.tab === tab.value"
+        (click)="setTab(tab.value)"
+      >
+        {{ tab.label }}
+        @if (tab.count !== undefined) {
+          <span class="tab-count" [class.tab-count-red]="tab.urgent">{{ tab.count }}</span>
+        }
+      </button>
+    }
+  </div>
+
+</div>

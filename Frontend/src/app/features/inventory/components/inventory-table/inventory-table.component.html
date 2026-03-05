@@ -1,0 +1,165 @@
+<div class="table-card">
+
+  <!-- Loading state -->
+  @if (loading) {
+    <div class="table-loading">
+      <div class="spinner"></div>
+      <span>Loading inventory…</span>
+    </div>
+  } @else if ((items?.length ?? 0) === 0) {
+    <div class="table-empty">
+      <div class="empty-icon">📭</div>
+      <div class="empty-title">No items found</div>
+      <div class="empty-sub">Try adjusting your search or filter</div>
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>
+              <input type="checkbox" class="check" (change)="toggleAll($event)" />
+            </th>
+            <th (click)="sortBy('skuCode')" class="sortable">
+              SKU <span class="sort-arrow">↕</span>
+            </th>
+            <th (click)="sortBy('name')" class="sortable">
+              Item / Batch <span class="sort-arrow">↕</span>
+            </th>
+            <th>Category</th>
+            <th>Warehouse</th>
+            <th (click)="sortBy('currentStock')" class="sortable">
+              Stock <span class="sort-arrow">↕</span>
+            </th>
+            <th>ROL</th>
+            <th>Level</th>
+            <th>ABC</th>
+            <th (click)="sortBy('expiryDate')" class="sortable">
+              Expiry <span class="sort-arrow">↕</span>
+            </th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items; track item.id) {
+            <tr [class.row-selected]="isSelected(item.id)" (click)="rowClick.emit(item)">
+
+              <!-- Checkbox -->
+              <td class="td-check" (click)="$event.stopPropagation()">
+                <input type="checkbox" class="check"
+                  [checked]="isSelected(item.id)"
+                  (change)="toggleSelect(item.id)" />
+              </td>
+
+              <!-- SKU -->
+              <td class="mono muted">{{ item.skuCode }}</td>
+
+              <!-- Item + Batch -->
+              <td>
+                <div class="item-name">{{ item.name }}</div>
+                <div class="item-batch">
+                  @if ((item.batches?.length ?? 0) > 0) {
+                    {{ item.batches?.[0]?.batchNumber }}
+                    @if ((item.batches?.length ?? 0) > 1) {
+                      <span class="batch-more">+{{ (item.batches?.length ?? 0) - 1 }} more</span>
+                    }
+                  } @else {
+                    <span class="no-batch">No batch</span>
+                  }
+                </div>
+              </td>
+
+              <!-- Category -->
+              <td class="muted">{{ item.category }}</td>
+
+              <!-- Warehouse -->
+              <td class="muted">{{ item.warehouseName }}</td>
+
+              <!-- Stock -->
+              <td>
+                <span class="stock-val" [class]="stockValClass(item)">
+                  {{ item.currentStock | number }}
+                </span>
+                <span class="stock-uom">{{ item.uom }}</span>
+              </td>
+
+              <!-- ROL -->
+              <td class="mono">{{ item.reorderLevel | number }}</td>
+
+              <!-- Level bar -->
+              <td>
+                <div class="level-wrap">
+                  <div class="stock-bar">
+                    <div
+                      class="stock-fill"
+                      [class]="barClass(item)"
+                      [style.width.%]="stockPercent(item)"
+                    ></div>
+                  </div>
+                  <span class="level-pct">{{ stockPercent(item) }}%</span>
+                </div>
+              </td>
+
+              <!-- ABC Class -->
+              <td>
+                <span class="abc-badge" [class]="abcClass(item.abcClass)">
+                  {{ item.abcClass }}
+                </span>
+              </td>
+
+              <!-- Expiry -->
+              <td class="mono" [class.expiry-warn]="isExpirySoon(item)" [class.expiry-danger]="isExpired(item)">
+                @if ((item.batches?.length ?? 0) > 0) {
+                  {{ item.batches?.[0]?.expiryDate | date:'dd MMM yy' }}
+                } @else {
+                  <span class="muted">—</span>
+                }
+              </td>
+
+              <!-- Status badge -->
+              <td>
+                <span class="status-badge" [class]="statusClass(item.status)">
+                  <span class="status-dot"></span>
+                  {{ item.status }}
+                </span>
+              </td>
+
+              <!-- Actions -->
+              <td class="td-actions" (click)="$event.stopPropagation()">
+                <button class="action-btn" title="View detail"   (click)="rowClick.emit(item)">👁</button>
+                <button class="action-btn" title="Edit item"     (click)="editClick.emit(item)">✏️</button>
+                <button class="action-btn" title="View ledger"   (click)="ledgerClick.emit(item)">📋</button>
+                <button class="action-btn action-btn-danger" title="Transfer stock" (click)="transferClick.emit(item)">🔄</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <span class="pagination-info">
+        Showing {{ (page - 1) * pageSize + 1 }}–{{ min(page * pageSize, total) }} of {{ total | number }} items
+      </span>
+      <div class="pagination-controls">
+        <button class="page-btn" [disabled]="page === 1" (click)="pageChange.emit(page - 1)">← Prev</button>
+        @for (p of pageNumbers(); track p) {
+          <button
+            class="page-btn"
+            [class.page-active]="p === page"
+            (click)="pageChange.emit(p)"
+          >{{ p }}</button>
+        }
+        <button class="page-btn" [disabled]="page >= totalPages" (click)="pageChange.emit(page + 1)">Next →</button>
+      </div>
+      <select class="page-size-select" [value]="pageSize" (change)="pageSizeChange.emit(+$any($event.target).value)">
+        <option value="10">10 / page</option>
+        <option value="20">20 / page</option>
+        <option value="50">50 / page</option>
+      </select>
+    </div>
+  }
+
+</div>

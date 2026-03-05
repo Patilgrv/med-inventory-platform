@@ -1,0 +1,40 @@
+<div class="stats-grid">
+  <div class="stat-card accent">
+    <div class="stat-header">
+      <div class="stat-icon">📦</div>
+      <span class="stat-trend trend-up">↑ 2.1%</span>
+    </div>
+    <div class="stat-value">{{ stats?.totalSkus | number }}</div>
+    <div class="stat-label">Total SKUs</div>
+    <div class="stat-sub">₹{{ (stats?.totalValue ?? 0) | number:'1.0-0' }} valuation</div>
+  </div>
+
+  <div class="stat-card red">
+    <div class="stat-header">
+      <div class="stat-icon">📉</div>
+      <span class="stat-trend trend-down">{{ stats?.lowStockCount }} items</span>
+    </div>
+    <div class="stat-value">{{ stats?.outOfStockCount }}</div>
+    <div class="stat-label">Out of Stock</div>
+    <div class="stat-sub">{{ stats?.lowStockCount }} more below ROL</div>
+  </div>
+
+  <div class="stat-card amber">
+    <div class="stat-header">
+      <div class="stat-icon">⏱</div>
+      <span class="stat-trend trend-down">30 days</span>
+    </div>
+    <div class="stat-value">{{ stats?.expiringCount }}</div>
+    <div class="stat-label">Expiring Soon</div>
+    <div class="stat-sub">Class A: 42 · Class B: 28</div>
+  </div>
+
+  <div class="stat-card blue">
+    <div class="stat-header">
+      <div class="stat-icon">🏭</div>
+    </div>
+    <div class="stat-value">{{ stats?.warehouseCount }}</div>
+    <div class="stat-label">Warehouses Active</div>
+    <div class="stat-sub">Main · Cold Storage · Annexe</div>
+  </div>
+</div>

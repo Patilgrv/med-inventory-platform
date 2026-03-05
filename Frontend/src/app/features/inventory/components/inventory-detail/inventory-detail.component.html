@@ -1,0 +1,322 @@
+@if (loading()) {
+  <div class="page-loading">
+    <div class="spinner"></div>
+    <span>Loading item…</span>
+  </div>
+}
+
+@if (!loading() && item()) {
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a [routerLink]="['/inventory']">Inventory</a>
+    <span class="bc-sep">›</span>
+    <span>{{ item()!.name }}</span>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="item-title-row">
+        <h1 class="page-title">{{ item()!.name }}</h1>
+        <span class="status-badge" [class]="statusClass(item()!.status)">
+          <span class="status-dot"></span>{{ item()!.status }}
+        </span>
+      </div>
+      <div class="item-meta">
+        <span class="meta-chip">SKU: {{ item()!.skuCode }}</span>
+        <span class="meta-chip">{{ item()!.category }}</span>
+        <span class="meta-chip abc" [class]="abcClass(item()!.abcClass ?? '')">Class {{ item()!.abcClass ?? '' }}</span>
+        <span class="meta-chip">{{ item()!.warehouseName }}</span>
+        <span class="meta-chip muted">Updated {{ item()!.lastUpdated | date:'dd MMM yyyy, hh:mm a' }}</span>
+      </div>
+    </div>
+    <div class="page-header-right">
+      <button class="btn btn-ghost" (click)="goToEdit()">✏️ Edit Item</button>
+      <button class="btn btn-ghost" (click)="openTransfer()">🔄 Transfer Stock</button>
+      <button class="btn btn-primary" [routerLink]="['/grn/new']">+ Create GRN</button>
+    </div>
+  </div>
+
+  <!-- Stock Summary Cards -->
+  <div class="stock-cards">
+    <div class="stock-card">
+      <div class="sc-label">Current Stock</div>
+      <div class="sc-value" [class]="stockValClass(item()!)">
+        {{ (item()!.currentStock ?? 0) | number }}
+      </div>
+      <div class="sc-unit">{{ item()!.uom }}</div>
+      <div class="sc-bar">
+        <div class="sc-fill" [class]="barClass(item()!)" [style.width.%]="stockPercent(item()!)"></div>
+      </div>
+      <div class="sc-sub">{{ stockPercent(item()!) }}% of max ({{ (item()!.maxStockLevel ?? 0) | number }})</div>
+    </div>
+
+    <div class="stock-card">
+      <div class="sc-label">Reorder Level (ROL)</div>
+      <div class="sc-value accent">{{ (item()!.reorderLevel ?? 0) | number }}</div>
+      <div class="sc-unit">{{ item()!.uom }}</div>
+      <div class="sc-sub">
+        @if ((item()!.currentStock ?? 0) <= (item()!.reorderLevel ?? 0)) {
+          <span class="sc-alert">⚠ Below ROL — reorder required</span>
+        } @else {
+          <span class="sc-ok">✓ Above ROL — stock healthy</span>
+        }
+      </div>
+    </div>
+
+    <div class="stock-card">
+      <div class="sc-label">Min / Max Stock</div>
+      <div class="sc-value">{{ (item()!.minStockLevel ?? 0) | number }}</div>
+      <div class="sc-unit">min · {{ (item()!.maxStockLevel ?? 0) | number }} max</div>
+      <div class="sc-sub">Safety buffer: {{ (item()!.reorderLevel ?? 0) - (item()!.minStockLevel ?? 0) | number }} units</div>
+    </div>
+
+    <div class="stock-card">
+      <div class="sc-label">Active Batches</div>
+      <div class="sc-value blue">{{ (item()!.batches ?? []).length }}</div>
+      <div class="sc-unit">batches tracked</div>
+      <div class="sc-sub">
+        @if (nearestExpiry()) {
+          Next expiry: <span class="expiry-warn">{{ nearestExpiry() | date:'dd MMM yyyy' }}</span>
+        } @else {
+          No expiry data
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tabs-nav">
+    <button class="tab-btn" [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">
+      📊 Overview
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'batches'" (click)="loadBatches()">
+      🗂 Batches
+      <span class="tab-count">{{ (item()!.batches ?? []).length }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'ledger'" (click)="loadLedger()">
+      📋 Stock Ledger
+    </button>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+
+    <!-- OVERVIEW TAB -->
+    @if (activeTab() === 'overview') {
+      <div class="overview-grid">
+
+        <!-- Item Details -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Item Information</div>
+          </div>
+          <div class="detail-list">
+            <div class="detail-row">
+              <span class="detail-label">Generic Name</span>
+              <span class="detail-value">{{ item()!.genericName || '—' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Category</span>
+              <span class="detail-value">{{ item()!.category }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Unit of Measure</span>
+              <span class="detail-value mono">{{ item()!.uom }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">ABC Classification</span>
+              <span class="detail-value">
+                <span class="abc-badge" [class]="abcClass(item()!.abcClass ?? '')">{{ item()!.abcClass ?? '' }}</span>
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">XYZ Classification</span>
+              <span class="detail-value">
+                <span class="abc-badge abc-b">{{ item()!.xyzClass }}</span>
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Warehouse</span>
+              <span class="detail-value">{{ item()!.warehouseName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">SKU Code</span>
+              <span class="detail-value mono">{{ item()!.skuCode }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stock Thresholds -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Stock Thresholds</div>
+          </div>
+          <div class="thresholds">
+            <div class="threshold-bar-wrap">
+              <div class="threshold-track">
+                <div class="threshold-fill" [style.width.%]="stockPercent(item()!)"></div>
+                <div class="threshold-marker rol"
+                  [style.left.%]="((item()!.reorderLevel ?? 0) / (item()!.maxStockLevel ?? 1)) * 100"
+                  title="ROL: {{ item()!.reorderLevel ?? 0 }}">
+                </div>
+                <div class="threshold-marker min"
+                  [style.left.%]="((item()!.minStockLevel ?? 0) / (item()!.maxStockLevel ?? 1)) * 100"
+                  title="Min: {{ item()!.minStockLevel ?? 0 }}">
+                </div>
+              </div>
+              <div class="threshold-labels">
+                <span>0</span>
+                <span>Max: {{ (item()!.maxStockLevel ?? 0) | number }}</span>
+              </div>
+            </div>
+
+            <div class="threshold-legend">
+              <div class="tl-item">
+                <span class="tl-dot" style="background:var(--accent)"></span>
+                <span class="tl-label">Current Stock</span>
+                <span class="tl-val accent">{{ (item()!.currentStock ?? 0) | number }}</span>
+              </div>
+              <div class="tl-item">
+                <span class="tl-dot" style="background:var(--red)"></span>
+                <span class="tl-label">Min Stock</span>
+                <span class="tl-val">{{ (item()!.minStockLevel ?? 0) | number }}</span>
+              </div>
+              <div class="tl-item">
+                <span class="tl-dot" style="background:var(--amber)"></span>
+                <span class="tl-label">Reorder Level</span>
+                <span class="tl-val">{{ (item()!.reorderLevel ?? 0) | number }}</span>
+              </div>
+              <div class="tl-item">
+                <span class="tl-dot" style="background:var(--border-light)"></span>
+                <span class="tl-label">Max Stock</span>
+                <span class="tl-val">{{ (item()!.maxStockLevel ?? 0) | number }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- BATCHES TAB -->
+    @if (activeTab() === 'batches') {
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🗂 Batch Records</div>
+          <span class="header-count">{{ batches().length }} batches</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Batch No</th>
+                <th>Qty Available</th>
+                <th>Mfg Date</th>
+                <th>Expiry Date</th>
+                <th>Days Left</th>
+                <th>Cost Price</th>
+                <th>GRN Ref</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (batch of batches(); track batch.id) {
+                <tr>
+                  <td class="mono bold">{{ batch.batchNumber }}</td>
+                  <td><strong>{{ batch.quantity | number }}</strong> {{ item()!.uom }}</td>
+                  <td class="mono">{{ batch.mfgDate | date:'dd MMM yyyy' }}</td>
+                  <td class="mono" [class.expiry-warn]="isExpiringSoon(batch)" [class.expiry-danger]="isExpired(batch)">
+                    {{ batch.expiryDate | date:'dd MMM yyyy' }}
+                  </td>
+                  <td>
+                    <span class="days-chip" [class]="daysClass(daysUntilExpiry(batch))">
+                      {{ daysUntilExpiry(batch) }} days
+                    </span>
+                  </td>
+                  <td class="mono">₹{{ (batch.costPrice ?? 0) | number:'1.2-2' }}</td>
+                  <td class="mono muted">{{ batch.grnId }}</td>
+                  <td>
+                    @if (!batch.isActive) {
+                      <span class="status-badge status-red"><span class="status-dot"></span>Inactive</span>
+                    } @else if (isExpired(batch)) {
+                      <span class="status-badge status-red"><span class="status-dot"></span>Expired</span>
+                    } @else if (isExpiringSoon(batch)) {
+                      <span class="status-badge status-amber"><span class="status-dot"></span>Expiring</span>
+                    } @else {
+                      <span class="status-badge status-green"><span class="status-dot"></span>Active</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- LEDGER TAB -->
+    @if (activeTab() === 'ledger') {
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 Stock Ledger</div>
+          <span class="header-count">Full audit trail</span>
+        </div>
+        @if (ledgerLoading()) {
+          <div class="table-loading">
+            <div class="spinner"></div><span>Loading ledger…</span>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date & Time</th>
+                  <th>Transaction</th>
+                  <th>Batch</th>
+                  <th>Qty Change</th>
+                  <th>Balance After</th>
+                  <th>Reference</th>
+                  <th>Warehouse</th>
+                  <th>Done By</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (entry of ledger(); track entry.id) {
+                  <tr>
+                    <td class="mono muted">{{ entry.createdAt | date:'dd MMM yy, hh:mm a' }}</td>
+                    <td>
+                      <span class="txn-badge" [class]="txnClass(entry.transactionType ?? '')">
+                        {{ entry.transactionType }}
+                      </span>
+                    </td>
+                    <td class="mono">{{ entry.batchNumber ?? '—' }}</td>
+                    <td>
+                      <span [class]="(entry.quantity ?? 0) > 0 ? 'qty-in' : 'qty-out'">
+                        {{ entry.quantity && entry.quantity > 0 ? '+' : '' }}{{ entry.quantity | number }}
+                      </span>
+                    </td>
+                    <td class="mono bold">{{ entry.balanceAfter | number }}</td>
+                    <td class="mono muted">{{ entry.referenceNo }}</td>
+                    <td class="muted">{{ entry.warehouseId }}</td>
+                    <td class="muted">{{ entry.createdBy }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <span class="pagination-info">
+              Page {{ ledgerPage() }} of {{ ledgerTotalPages() }}
+            </span>
+            <div class="pagination-controls">
+              <button class="page-btn" [disabled]="ledgerPage() === 1" (click)="loadLedgerPage(ledgerPage() - 1)">← Prev</button>
+              <button class="page-btn" [disabled]="ledgerPage() >= ledgerTotalPages()" (click)="loadLedgerPage(ledgerPage() + 1)">Next →</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+}

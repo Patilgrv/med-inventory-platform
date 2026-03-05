@@ -1,0 +1,200 @@
+// ── Breadcrumb ──
+.breadcrumb {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text-muted);
+    margin-bottom: 16px; font-family: var(--font-mono);
+  
+    a { color: var(--accent); text-decoration: none; &:hover { text-decoration: underline; } }
+    .bc-sep { color: var(--text-muted); }
+  }
+  
+  // ── Page Header ──
+  .page-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 16px;
+    margin-bottom: 24px; flex-wrap: wrap;
+  }
+  .page-title { font-family: var(--font-display); font-size: 22px; font-weight: 800; }
+  .page-sub   { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+  .header-actions { display: flex; gap: 8px; }
+  
+  .btn {
+    padding: 8px 16px; border-radius: 7px; border: none;
+    cursor: pointer; font-family: var(--font-body); font-size: 13px;
+    font-weight: 500; transition: all 0.15s;
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+  .btn-ghost   { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border); &:hover { color: var(--text-primary); border-color: var(--border-light); } }
+  .btn-primary { background: var(--accent); color: #001a14; font-weight: 600; &:hover { background: #00f0c0; } }
+  
+  // ── Error Banner ──
+  .error-banner {
+    background: var(--red-dim); border: 1px solid var(--red);
+    border-radius: 8px; padding: 12px 16px;
+    font-size: 13px; color: var(--red); margin-bottom: 20px;
+  }
+  
+  // ── Form Layout ──
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  
+  .form-col { display: flex; flex-direction: column; gap: 16px; }
+  
+  // ── Card ──
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; flex: 1; }
+  .card-hint  { font-size: 11px; color: var(--text-muted); }
+  .card-body  { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  
+  // ── Fields ──
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .field-label {
+    font-size: 11px; font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  
+  .req { color: var(--red); margin-left: 2px; }
+  
+  input[type="text"],
+  input[type="number"],
+  input:not([type]),
+  select,
+  textarea {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 9px 12px;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  
+    &::placeholder { color: var(--text-muted); }
+    &:focus { border-color: var(--accent); }
+    &[readonly] { opacity: 0.6; cursor: not-allowed; }
+  
+    option { background: var(--bg-surface); }
+  }
+  
+  textarea { resize: vertical; min-height: 80px; }
+  
+  .field-error { font-size: 11px; color: var(--red); }
+  
+  .input-with-hint { position: relative; }
+  .input-hint {
+    position: absolute; right: 10px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px; color: var(--text-muted);
+    pointer-events: none;
+  }
+  
+  // ── ROL field ──
+  .rol-auto-badge {
+    display: inline-block;
+    margin-left: 6px; padding: 1px 7px; border-radius: 4px;
+    background: var(--accent-dim); color: var(--accent);
+    font-size: 10px; font-weight: 600; text-transform: none; letter-spacing: 0;
+  }
+  
+  .rol-formula {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-muted); background: var(--bg-surface);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 8px 12px; margin-bottom: 8px;
+  }
+  
+  // ── Radio Cards (ABC/XYZ) ──
+  .radio-group { display: flex; gap: 8px; }
+  
+  .radio-card {
+    flex: 1; padding: 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--bg-surface);
+    cursor: pointer; text-align: center; transition: all 0.15s;
+    display: flex; flex-direction: column; gap: 2px;
+  
+    &:hover { border-color: var(--border-light); }
+  
+    &.selected {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+  
+    &.radio-a.selected { border-color: var(--red);   background: var(--red-dim); }
+    &.radio-b.selected { border-color: var(--amber); background: var(--amber-dim); }
+    &.radio-c.selected { border-color: var(--blue);  background: var(--blue-dim); }
+  }
+  
+  .radio-label { font-size: 16px; font-weight: 800; font-family: var(--font-display); }
+  .radio-hint  { font-size: 10px; color: var(--text-muted); }
+  
+  // ── Threshold Preview ──
+  .threshold-preview {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 4px;
+  }
+  
+  .tp-label {
+    font-size: 11px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;
+  }
+  
+  .tp-track {
+    position: relative; height: 8px;
+    background: var(--border); border-radius: 4px; margin-bottom: 4px;
+  
+    .tp-min {
+      position: absolute; top: -3px;
+      width: 3px; height: 14px; background: var(--red); border-radius: 2px;
+    }
+    .tp-rol {
+      position: absolute; top: -3px;
+      width: 3px; height: 14px; background: var(--amber); border-radius: 2px;
+    }
+  }
+  
+  .tp-axis {
+    display: flex; justify-content: space-between;
+    font-size: 10px; color: var(--text-muted); font-family: var(--font-mono);
+    margin-bottom: 10px;
+  }
+  
+  .tp-legend { display: flex; gap: 16px; flex-wrap: wrap; }
+  .tpl-item  { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); font-family: var(--font-mono); }
+  .tpl-dot   { width: 8px; height: 8px; border-radius: 2px; }
+  
+  // ── Form Footer ──
+  .form-footer {
+    display: flex; justify-content: flex-end; gap: 10px;
+    margin-top: 24px; padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }

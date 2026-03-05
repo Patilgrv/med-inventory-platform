@@ -28,7 +28,7 @@ export const routes: Routes = [
       {
         path: 'inventory',
         loadChildren: () =>
-          import('./features/inventory/inventory.module').then(m => m.InventoryModule),
+          import('./features/inventory/inventory.routes').then(m => m.inventoryRoutes),
       },
       {
         path: 'grn',

@@ -1,0 +1,243 @@
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+  <a [routerLink]="['/inventory']">Inventory</a>
+  <span class="bc-sep">›</span>
+  <span>{{ isEdit() ? 'Edit Item' : 'Add New Item' }}</span>
+</div>
+
+<!-- Page Header -->
+<div class="page-header">
+  <div>
+    <h1 class="page-title">{{ isEdit() ? 'Edit Item' : 'Add New Item' }}</h1>
+    <p class="page-sub">{{ isEdit() ? 'Update item details and stock thresholds' : 'Register a new item in the inventory master' }}</p>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" [routerLink]="['/inventory']">✕ Cancel</button>
+    <button class="btn btn-primary" (click)="onSubmit()" [disabled]="saving()">
+      {{ saving() ? 'Saving…' : (isEdit() ? '💾 Update Item' : '+ Add Item') }}
+    </button>
+  </div>
+</div>
+
+<!-- Error banner -->
+@if (errorMsg()) {
+  <div class="error-banner">⚠ {{ errorMsg() }}</div>
+}
+
+<form [formGroup]="form">
+  <div class="form-grid">
+
+    <!-- LEFT COLUMN -->
+    <div class="form-col">
+
+      <!-- Basic Info -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 Basic Information</div>
+        </div>
+        <div class="card-body">
+
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label">Item Name <span class="req">*</span></label>
+              <input formControlName="name" placeholder="e.g. Paracetamol 500mg Tab" />
+              @if (hasError('name', 'required')) {
+                <span class="field-error">Item name is required</span>
+              }
+            </div>
+            <div class="field">
+              <label class="field-label">Generic Name</label>
+              <input formControlName="genericName" placeholder="e.g. Paracetamol" />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label">SKU Code <span class="req">*</span></label>
+              <input formControlName="skuCode" placeholder="e.g. SKU-001" [readonly]="isEdit()" />
+              @if (hasError('skuCode', 'required')) {
+                <span class="field-error">SKU code is required</span>
+              }
+            </div>
+            <div class="field">
+              <label class="field-label">Category <span class="req">*</span></label>
+              <select formControlName="category">
+                <option value="">Select category</option>
+                <option>Analgesic</option>
+                <option>Antibiotic</option>
+                <option>Antidiabetic</option>
+                <option>Antihypertensive</option>
+                <option>Hormone</option>
+                <option>Vitamin & Supplement</option>
+                <option>Surgical Supply</option>
+                <option>Consumable</option>
+                <option>Equipment</option>
+              </select>
+              @if (hasError('category', 'required')) {
+                <span class="field-error">Category is required</span>
+              }
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label">Unit of Measure <span class="req">*</span></label>
+              <select formControlName="uom">
+                <option value="">Select UOM</option>
+                <option value="Tablet">Tablet</option>
+                <option value="Strip">Strip</option>
+                <option value="Box">Box</option>
+                <option value="Vial">Vial</option>
+                <option value="Ampoule">Ampoule</option>
+                <option value="Bottle">Bottle</option>
+                <option value="Unit">Unit</option>
+                <option value="Litre">Litre</option>
+                <option value="Kg">Kg</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field-label">Warehouse <span class="req">*</span></label>
+              <select formControlName="warehouseId">
+                <option value="">Select warehouse</option>
+                <option value="wh-01">WH-01 Main Store</option>
+                <option value="wh-02">WH-02 Cold Storage</option>
+                <option value="wh-03">WH-03 Annexe</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Classification -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏷 Classification</div>
+          <span class="card-hint">Used for ROL calculation and prioritization</span>
+        </div>
+        <div class="card-body">
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label">ABC Class <span class="req">*</span></label>
+              <div class="radio-group">
+                @for (opt of ['A','B','C']; track opt) {
+                  <label class="radio-card" [class.selected]="form.get('abcClass')?.value === opt" [class]="'radio-' + opt.toLowerCase()">
+                    <input type="radio" formControlName="abcClass" [value]="opt" hidden />
+                    <span class="radio-label">{{ opt }}</span>
+                    <span class="radio-hint">{{ abcHint(opt) }}</span>
+                  </label>
+                }
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">XYZ Class</label>
+              <div class="radio-group">
+                @for (opt of ['X','Y','Z']; track opt) {
+                  <label class="radio-card" [class.selected]="form.get('xyzClass')?.value === opt">
+                    <input type="radio" formControlName="xyzClass" [value]="opt" hidden />
+                    <span class="radio-label">{{ opt }}</span>
+                    <span class="radio-hint">{{ xyzHint(opt) }}</span>
+                  </label>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="form-col">
+
+      <!-- Stock Thresholds -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📊 Stock Thresholds</div>
+          <span class="card-hint">ROL auto-calculated based on these values</span>
+        </div>
+        <div class="card-body">
+
+          <div class="field">
+            <label class="field-label">Minimum Stock Level <span class="req">*</span></label>
+            <div class="input-with-hint">
+              <input type="number" formControlName="minStockLevel" placeholder="0" min="0" />
+              <span class="input-hint">Safety stock floor</span>
+            </div>
+            @if (hasError('minStockLevel', 'required')) {
+              <span class="field-error">Required</span>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field-label">Maximum Stock Level <span class="req">*</span></label>
+            <div class="input-with-hint">
+              <input type="number" formControlName="maxStockLevel" placeholder="0" min="0" />
+              <span class="input-hint">Storage capacity</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label">
+              Reorder Level (ROL)
+              <span class="rol-auto-badge">Auto-calculated</span>
+            </label>
+            <div class="rol-preview">
+              <div class="rol-formula">
+                ROL = (Daily Usage × Lead Time) + Safety Stock
+              </div>
+              <input type="number" formControlName="reorderLevel"
+                placeholder="Or enter manually" min="0" />
+            </div>
+          </div>
+
+          @if (canPreview()) {
+            <div class="threshold-preview">
+              <div class="tp-label">Threshold Preview</div>
+              <div class="tp-track">
+                <div class="tp-min"    [style.left.%]="minPct()"></div>
+                <div class="tp-rol"    [style.left.%]="rolPct()"></div>
+              </div>
+              <div class="tp-axis">
+                <span>0</span>
+                <span>{{ form.get('maxStockLevel')?.value }}</span>
+              </div>
+              <div class="tp-legend">
+                <span class="tpl-item"><span class="tpl-dot" style="background:var(--red)"></span>Min: {{ form.get('minStockLevel')?.value }}</span>
+                <span class="tpl-item"><span class="tpl-dot" style="background:var(--amber)"></span>ROL: {{ form.get('reorderLevel')?.value }}</span>
+                <span class="tpl-item"><span class="tpl-dot" style="background:var(--border-light)"></span>Max: {{ form.get('maxStockLevel')?.value }}</span>
+              </div>
+            </div>
+          }
+
+        </div>
+      </div>
+
+      <!-- Optional Notes -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📝 Notes</div>
+          <span class="card-hint">Optional</span>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label class="field-label">Storage Instructions</label>
+            <textarea formControlName="storageInstructions"
+              placeholder="e.g. Store below 25°C, away from direct sunlight…"
+              rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Form Footer -->
+  <div class="form-footer">
+    <button type="button" class="btn btn-ghost" [routerLink]="['/inventory']">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="saving()">
+      {{ saving() ? 'Saving…' : (isEdit() ? '💾 Update Item' : '+ Add Item') }}
+    </button>
+  </div>
+
+</form>

@@ -1,0 +1,265 @@
+.table-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  // ── States ──
+  .table-loading,
+  .table-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    gap: 12px;
+  }
+  
+  .spinner {
+    width: 28px; height: 28px;
+    border: 2px solid var(--border-light);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  
+  .empty-icon  { font-size: 36px; }
+  .empty-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text-secondary); }
+  .empty-sub   { font-size: 12px; }
+  
+  // ── Table ──
+  .table-wrap { overflow-x: auto; }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  
+    thead tr {
+      background: var(--bg-surface);
+    }
+  
+    thead th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      user-select: none;
+  
+      &.sortable {
+        cursor: pointer;
+        &:hover { color: var(--text-primary); }
+      }
+    }
+  
+    .sort-arrow { font-size: 10px; opacity: 0.4; }
+  
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.12s;
+      cursor: pointer;
+  
+      &:last-child { border: none; }
+      &:hover { background: var(--bg-card-hover); }
+      &.row-selected { background: var(--accent-dim); }
+    }
+  
+    td {
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--text-primary);
+      vertical-align: middle;
+      white-space: nowrap;
+  
+      &.mono  { font-family: var(--font-mono); font-size: 12px; }
+      &.muted { color: var(--text-secondary); font-size: 12px; }
+  
+      &.expiry-warn   { color: var(--amber) !important; }
+      &.expiry-danger { color: var(--red)   !important; }
+    }
+  }
+  
+  // ── Checkbox ──
+  .check {
+    width: 15px; height: 15px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+  
+  .td-check { width: 40px; }
+  
+  // ── Item cell ──
+  .item-name  { font-weight: 600; font-size: 13px; }
+  .item-batch {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .batch-more { color: var(--blue);        margin-left: 4px; }
+  .no-batch   { color: var(--text-muted);  font-style: italic; }
+  
+  // ── Stock value ──
+  .stock-val  { font-weight: 700; font-size: 14px; }
+  .stock-uom  { font-size: 10px; color: var(--text-muted); margin-left: 3px; }
+  .val-red    { color: var(--red); }
+  .val-amber  { color: var(--amber); }
+  .val-green  { color: var(--accent); }
+  
+  // ── Level bar ──
+  .level-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .stock-bar {
+    width: 64px; height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    flex-shrink: 0;
+  
+    .stock-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.4s ease;
+  
+      &.fill-green { background: var(--accent); }
+      &.fill-amber { background: var(--amber); }
+      &.fill-red   { background: var(--red); }
+    }
+  }
+  
+  .level-pct {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 32px;
+  }
+  
+  // ── ABC Badge ──
+  .abc-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+  
+    &.abc-a { background: var(--red-dim);    color: var(--red); }
+    &.abc-b { background: var(--amber-dim);  color: var(--amber); }
+    &.abc-c { background: var(--blue-dim);   color: var(--blue); }
+  }
+  
+  // ── Status Badge ──
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 600;
+  
+    .status-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+  
+    &.status-green  { background: var(--accent-dim); color: var(--accent); }
+    &.status-amber  { background: var(--amber-dim);  color: var(--amber); }
+    &.status-red    { background: var(--red-dim);    color: var(--red); }
+  }
+  
+  // ── Actions ──
+  .td-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  
+  .action-btn {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  
+    &:hover {
+      border-color: var(--border-light);
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+    }
+  
+    &.action-btn-danger:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  }
+  
+  // ── Pagination ──
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-surface);
+  }
+  
+  .pagination-info {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    flex: 1;
+  }
+  
+  .pagination-controls {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  
+  .page-btn {
+    min-width: 32px; height: 30px;
+    padding: 0 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    transition: all 0.15s;
+  
+    &:hover:not(:disabled) { border-color: var(--border-light); color: var(--text-primary); }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+    &.page-active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  }
+  
+  .page-size-select {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 8px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-family: var(--font-mono);
+    outline: none;
+    cursor: pointer;
+  }
